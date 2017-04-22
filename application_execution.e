@@ -39,13 +39,55 @@ feature {NONE} --Initialization
 			map_uri_template_agent("/api/admin/publications", agent publications_over_year, router.methods_get)
 			map_uri_template_agent("/api/admin/unit_info", agent unit_info, router.methods_get)
 			map_uri_template_agent ("/api/admin/lab_courses", agent lab_courses, router.methods_get)
+			map_uri_template_agent ("/api/admin/number_students", agent number_students, rout.methods_get)
 			create fhdl.make_hidden("www")
 			fhdl.set_directory_index(<<"index.html">>)
 			router.handle("",fhdl,router.methods_GET)
 		end
 
 
+	number_students(req: WSF_REQUEST; res:WSF_RESPONSE)
+		local
+		db: SQLITE_DATABASE
+		db_query_statement: SQLITE_QUERY_STATEMENT
+		db_insert_statement: SQLITE_INSERT_STATEMENT
+		cursor: SQLITE_STATEMENT_ITERATION_CURSOR
+		query: READABLE_STRING_8
+		response_id :STRING
+		i : INTEGER
+		start_date:READABLE_STRING_8
+		end_date:READABLE_STRING_8
+		name_of_unit:READABLE_STRING_8
+		mesg: WSF_HTML_PAGE_RESPONSE
+        l_html: STRING
+        do
+        create db.make_open_read_write ("AnnualForm.db")
+        query := "[
+  			SELECT ANSWER FROM StudetSupervised    
+		]"
+		i:=0
+		io.put_string(query)
+		create db_query_statement.make (query, db)
+		cursor := db_query_statement.execute_new
+		create l_html.make_empty
+		create mesg.make
+		from
+			cursor.start
+		until
+			cursor.after
+		loop
 
+
+			i := i + cursor.item.string_value (0).split (",").count
+
+			cursor.forth
+		end
+		if i=0 then l_html.append ("<p>There is no any students in laboratories</p>") else
+			l_html.append ("<p> There are " + i.out + "students in laboratories" )
+		end
+		mesg.set_body (l_html)
+		response.send (mesg)
+        end
 
 	unit_info(req: WSF_REQUEST; res: WSF_RESPONSE)
 		local
