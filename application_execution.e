@@ -42,13 +42,14 @@ feature {NONE} --Initialization
 			map_uri_template_agent ("/api/admin/number_students", agent number_students, router.methods_get)
 			map_uri_template_agent ("/api/admin/number_collaborations", agent number_collaborations, router.methods_get)
 			map_uri_template_agent ("/api/admin/best_paper", agent best_paper, router.methods_get)
-			map_uri_template_agent ("/api/admin/units", agent units, router.methods_get)
+
+			map_uri_template_agent ("/api/admin/list_of_units", agent list_of_units, router.methods_get)
 			create fhdl.make_hidden("www")
 			fhdl.set_directory_index(<<"index.html">>)
 			router.handle("",fhdl,router.methods_GET)
 		end
 
-	units(req: WSF_REQUEST; res: WSF_RESPONSE)
+	list_of_units(req: WSF_REQUEST; res: WSF_RESPONSE)
 	local
 		db: SQLITE_DATABASE
 		db_query_statement: SQLITE_QUERY_STATEMENT
