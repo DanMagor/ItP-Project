@@ -41,13 +41,43 @@ feature {NONE} --Initialization
 			map_uri_template_agent ("/api/admin/lab_courses", agent lab_courses, router.methods_get)
 			map_uri_template_agent ("/api/admin/number_students", agent number_students, router.methods_get)
 			map_uri_template_agent ("/api/admin/number_collaborations", agent number_students, router.methods_get)
+			map_uri_template_agent ("/api/admin/best_paper", agent best_paper, router.methods_get)
 			create fhdl.make_hidden("www")
 			fhdl.set_directory_index(<<"index.html">>)
 			router.handle("",fhdl,router.methods_GET)
 		end
 
 
+	best_paper(req: WSF_REQUEST; res: WSF_RESPONSE)
+	local
+		db: SQLITE_DATABASE
+		db_query_statement: SQLITE_QUERY_STATEMENT
+		db_insert_statement: SQLITE_INSERT_STATEMENT
+		cursor: SQLITE_STATEMENT_ITERATION_CURSOR
+		query: READABLE_STRING_8
+		response_id :STRING
+		i : INTEGER
+		start_date:READABLE_STRING_8
+		end_date:READABLE_STRING_8
+		name_of_unit:READABLE_STRING_8
+		mesg: WSF_HTML_PAGE_RESPONSE
+        l_html: STRING
+        do
+        name_of_unit := ""
+        	if attached {WSF_STRING} req.query_parameter ("NameOfUnit") as data_i then
+			name_of_unit := data_i.url_encoded_value
+			end
+        create db.make_open_read_write ("AnnualForm.db")
 
+        query :="[
+  			SELECT BestPaperAwards.ANSWER FROM BestPaperAwards
+   			JOIN NameOfUnit
+    		ON BestPaperAwards.G_ID = NameOfUnit.G_ID
+			WHERE (NameOfUnit.ANSWER =
+			
+			]" + name_of_unit +");"
+
+		end
 
 	number_collaborations(req:WSF_REQUEST; res:WSF_RESPONSE)
 	local
@@ -101,9 +131,9 @@ feature {NONE} --Initialization
 		query: READABLE_STRING_8
 		response_id :STRING
 		i : INTEGER
+		name_of_unit:READABLE_STRING_8
 		start_date:READABLE_STRING_8
 		end_date:READABLE_STRING_8
-		name_of_unit:READABLE_STRING_8
 		mesg: WSF_HTML_PAGE_RESPONSE
         l_html: STRING
         do
