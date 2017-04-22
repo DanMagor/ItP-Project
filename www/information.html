@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+	<title></title>
+	
+	<link rel="stylesheet" type="text/css" href="css/style_admin.css" media="all" />
+	
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="js/jquery.inputfocus-0.9.min.js"></script>
+    <script type="text/javascript" src="js/jquery.main.js"></script>
+	
+
+	
+	
+  
+</head>
+<body>
+	
+	<div id="container">
+        <form action = "api/admin/unit_info" method = "get">
+	
+			
+			
+           <!-- #2_admin -->
+			
+			
+            <div id="2_admin">
+			
+				<h1>Annual Report</h1>
+				<p align="center"> <big> <big> Administrator Page </big> </big> </p>
+               
+                <div class="form" action = "api/admin/unit_info" method ="get">
+				<h2>Cumulative info of a given unit over several years.</h2>
+				
+					<input type="text" name="NameOfUnit" id="NameOfUnit" value="Unit Name" />
+                    <label for="NameOfUnitAdmin">Write the name of the Unit</label>
+				
+                    <input type = "date" name="StartOfReportingPeriod" id="StartOfReportingPeriod" value=" " />
+					<label for="StartOfInterestingPeriod">Choose the start of the period you are interested in </label>
+					
+					<input type = "date" name="EndOfReportingPeriod" id="EndOfReportingPeriod" value=" " />
+					<label for="EndOfInterestingPeriod">Choose the end of the period you are interested in </label>
+					
+					
+                     
+					 </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+                 
+					<input class="send submit" type="submit" name="submit_2_admin" id="submit_2_admin" value="" />  				
+            </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->		  	
+			
+		
+        </form>
+	</div>
+	
+	
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+	<title></title>
+	
+	<link rel="stylesheet" type="text/css" href="css/style.css" media="all" />
+	
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="js/jquery.inputfocus-0.9.min.js"></script>
+    <script type="text/javascript" src="js/jquery.main.js"></script>
+	
+	<style type="text/css">
+			
+			button
+			{
+				margin-top:10px;
+				margin-left:650px;
+				margin-right: 50px
+				
+			}
+		</style>
+  
+</head>
+<body>
+	
+	<div id="container">
+        <form action="api/submit" method="get">
+			
+			<button onclick = "location.href ='admin.html'">Admin</button>
+				
+				
+			
+            <!-- #first_step -->
+            <div id="first_step">
+                <h1>Annual Report</h1>
+
+                <div class="form">
+				<h2>General</h2>
+				<p><br>* Obligatory fields.</p>
+                    <input type="text" name="NameOfUnit" id="NameOfUnit" value="Unit Name" />
+                    <label for="NameOfUnit">Name of  Unit * <br>(At least 4 characters)</label>
+					
+					 <input type="text" name="NameOfHeadOfUnit" id="NameOfHeadOfUnit" value="Name of Head" />
+                    <label for="NameOfHeadOfUnit">Name of head of  Unit * <br>(At least 4 characters)</label>
+					
+					<input type = "date" name="StartOfReportingPeriod" id="StartOfReportingPeriod" value="Reporting Period" />
+					<label for="StartOfReportingPeriod">Start of reporting period </label>
+					
+					<input type = "date" name="EndOfReportingPeriod" id="EndOfReportingPeriod" value="Reporting Period 2" />
+					<label for="EndOfReportingPeriod">End of reporting period </label>
+					
+                     </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+               
+			
+			   
+					<input class="submit" type="submit" name="submit_first" id="submit_first" value="" />			
+            </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+
+
+            <!-- #second_step -->
+            <div id="second_step" style="display: none;">
+                <h1>Annual Report</h1>
+
+                <div class="form">
+				<h2>Teaching</h2>
+				<p><br>* Obligatory fields.</p>
+				
+                    <input type="text" name="CourseTaught" id="CourseTaught" value=" " />
+                    <label for="CourseTaught">Course taught *</label>
+					
+                    <input type="text" name="Examinations" id="Examinations" value=" " />
+                    <label for="Examinations">Examinations *</label>
+					
+                    <input type="text" name="StudentSupervised" id="StudentSupervised" value=" " />
+                    <label for="StudentSupervised">Student Supervised *</label>             
+
+					<input type="text" name="CompletedStudentReports" id="CompletedStudentReports" value=" " />
+                    <label for="CompletedStudentReports">Completed student report *</label>
+					
+					<input type="text" name="CompletedPhDTheses" id="CompletedPhDTheses" value=" " />
+                    <label for="CompletedPhDTheses">Completed PhD Theses </label>
+                </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+                
+				<input class="submit" type="submit" name="submit_second" id="submit_second" value="" />
+				<input class="previous" type="submit" name="return_first" id="return_first" value="" />
+				
+            </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+			
+			
+			<!-- #3_step -->
+            <div id="3_step" style="display: none;">
+			
+                <h1>Annual Report</h1>
+
+                <div class="form">
+				<h2>Research Information</h2>
+				<p><br>* Obligatory fields.</p>
+				
+                    <input type="text" name="Grants" id="Grants" value=" " />
+                    <label for="Grants">Grants *</label>
+					
+                    <input type="text" name="ResearchProjects" id="ResearchProjects" value=" " />
+                    <label for="ResearchProjects">Research projects *</label>
+					
+                    <input type="text" name="ResearchColaborations" id="ResearchColaborations" value=" " />
+                    <label for="ResearchColaborations">Research collaborations </label>             
+
+					<input type="text" name="ConferencePublications" id="ConferencePublications" value=" " />
+                    <label for="ConferencePublications">Conference publications </label>
+					
+					<input type="text" name="JournalPublications" id="JournalPublications" value=" " />
+                    <label for="JournalPublications">Journal publications </label>
+                </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+                
+				<input class="submit" type="submit" name="submit_3" id="submit_3" value="" />
+				<input class="previous" type="submit" name="return_second" id="return_second" value="" />
+				
+            </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+			
+			
+			<!-- #4_step -->
+            <div id="4_step" style="display: none;">
+			
+                <h1>Annual Report</h1>
+
+                <div class="form">
+				<h2>Technology Transfer</h2>
+				
+                    <input type="text" name="Patents" id="Patents" value=" " />
+                    <label for="Patents">Patents </label>
+					
+                    <input type="text" name="IPLicensing" id="IPLicensing" value=" " />
+                    <label for="IPLicensing">IP licensing (software or others) </label>
+					
+                </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+                
+				<input class="submit" type="submit" name="submit_4" id="submit_4" value="" />
+				<input class="previous" type="submit" name="return_3" id="return_3" value="" />
+				
+            </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+
+
+			<!-- #5_step -->
+            <div id="5_step" style="display: none;">
+			
+                <h1>Annual Report</h1>
+
+                <div class="form">
+				<h2>Distinctions</h2>
+				
+                    <input type="text" name="BestPaperAwards" id="BestPaperAwards" value=" " />
+                    <label for="BestPaperAwards">Best paper awards </label>
+					
+                    <input type="text" name="Membership" id="Membership" value=" " />
+                    <label for="Membership">Membership </label>
+					
+					<input type="text" name="Prizes" id="Prizes" value=" " />
+                    <label for="Prizes">Prizes </label>
+					
+                </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+                
+				<input class="submit" type="submit" name="submit_5" id="submit_5" value="" />
+				<input class="previous" type="submit" name="return_4" id="return_4" value="" />
+				
+            </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+			
+			
+			<!-- #6_step -->
+            <div id="6_step" style="display: none;">
+			
+                <h1>Annual Report</h1>
+
+                <div class="form">
+				<h2>Outside Activities Information</h2>
+				
+                    <input type="text" name="IndustryColaborations" id="IndustryColaborations" value=" " />
+                    <label for="IndustryColaborations">Industry collaborations </label>
+										
+                </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+                
+				<input class="submit" type="submit" name="submit_6" id="submit_6" value="" />
+				<input class="previous" type="submit" name="return_5" id="return_5" value="" />
+				
+            </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+			
+			
+			<!-- #7_step -->
+            <div id="7_step" style="display: none;">
+			
+                <h1>Annual Report</h1>
+
+                <div class="form">
+				<h2>Other Information</h2>
+				
+                    <input type="text" name="OtherInformation" id="OtherInformation" value=" " />
+                    <label for="OtherInformation">Other relevant information </label>
+										
+                </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+                
+				<input class="previous" type="submit" name="return_6" id="return_6" value="" />
+				<input class="send submit" type="submit" name="submit_7" id="submit_7" value="" />  
+			</div>	
+            
+        </form>
+	</div>
+	<div id="progress_bar">
+        <div id="progress"></div>
+        <div id="progress_text">0% Complete</div>
+	</div>
+	
+</body>
+</html>

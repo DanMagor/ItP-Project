@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+	<title></title>
+	
+	<link rel="stylesheet" type="text/css" href="css/style_admin.css" media="all" />
+	
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="js/jquery.inputfocus-0.9.min.js"></script>
+    <script type="text/javascript" src="js/jquery.main.js"></script>
+	
+
+	
+	
+  
+</head>
+<body>
+	
+	<div id="container">
+        <form action = "api/admin/lab_courses" method = "get">
+	
+			
+			
+            <!-- #3_admin -->
+            <div id="3_admin">
+				<h1>Annual Report</h1>
+				<p align="center"> <big> <big> Administrator Page </big> </big> </p>
+               
+                <div class="form" >
+				<h2>Courses taught by a Laboratory between initial and final date.</h2>
+				
+					<input type="text" name="NameOfUnit" id="NameOfUnit" value="The Name of the Laboratory" />
+                    <label for="NameOfTheLaboratory">Write the name of the Unit</label>
+				
+                    <input type = "date" name="StartOfReportingPeriod" id="StartOfReportingPeriod" value=" " />
+					<label for="InitialDate">Choose the start of the period you are interested in </label>
+					
+					<input type = "date" name="EndOfReporingPeriod" id="EndOfReporingPeriod" value=" " />
+					<label for="FinalDate">Choose the end of the period you are interested in </label>
+					
+					
+                     
+					 </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+                 
+					<input class="send submit" type="submit" name="submit_3_admin" id="submit_3_admin" value="" />  				
+            </div>      <!-- clearfix --><div class="clear"></div><!-- /clearfix -->
+			  	
+			
+		
+        </form>
+	</div>
+	
+	
+</body>
+</html>
