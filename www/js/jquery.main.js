@@ -364,5 +364,8 @@ $(function(){
 		$('form').unbind('submit').submit();
 	});
 	
+	$('#submit_5_admin').click(function(){
+		$('form').unbind('submit').submit();
+	});
 
 });
