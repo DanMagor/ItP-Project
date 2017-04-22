@@ -32,7 +32,7 @@ $(function(){
 			
 			//admin
 			'NameOfUnitAdmin' : 'Unit Name',
-			'NameOfTheLaboratory' : 'The Name of the Laboratory'
+			'NameOfTheLaboratory' : ' '
     };
 
 
@@ -340,7 +340,6 @@ $(function(){
                 
                 //slide steps
                 //send information to server
-				alert('Thank You. Your answer was sent');
 				$('form').unbind('submit').submit();
 			  
                           
@@ -358,6 +357,10 @@ $(function(){
 	});
 	
 	$('#submit_3_admin').click(function(){
+		$('form').unbind('submit').submit();
+	});
+	
+	$('#submit_4_admin').click(function(){
 		$('form').unbind('submit').submit();
 	});
 	
