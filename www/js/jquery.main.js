@@ -31,7 +31,7 @@ $(function(){
 			'OtherInformation' : ' ',
 			
 			//admin
-			'NameOfUnitAdmin' : 'Unit Name',
+			'NameOfUnitAdmin' : ' ',
 			'NameOfTheLaboratory' : ' '
     };
 
@@ -365,6 +365,10 @@ $(function(){
 	});
 	
 	$('#submit_5_admin').click(function(){
+		$('form').unbind('submit').submit();
+	});
+	
+	$('#submit_6_admin').click(function(){
 		$('form').unbind('submit').submit();
 	});
 
