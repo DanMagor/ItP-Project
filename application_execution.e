@@ -73,9 +73,19 @@ feature {NONE} --Initialization
   			SELECT BestPaperAwards.ANSWER FROM BestPaperAwards
    			JOIN NameOfUnit
     		ON BestPaperAwards.G_ID = NameOfUnit.G_ID
-			WHERE (NameOfUnit.ANSWER =
-
-			]" + name_of_unit +");"
+			WHERE (NameOfUnit.ANSWER ='
+			]" + name_of_unit +"');"
+		create db_query_statement.make (query, db)
+		cursor := db_query_statement.execute_new
+		create l_html.make_empty
+		create mesg.make
+		l_html.append ("<h1>Best papers:</h1>")
+		cursor.start
+		if(not cursor.after) then
+		l_html.append ("<p>" + cursor.item.string_value (1) + "</p>")
+		end
+		mesg.set_body (l_html)
+		response.send (mesg)
 
 		end
 
