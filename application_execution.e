@@ -40,16 +40,15 @@ feature {NONE} --Initialization
 			map_uri_template_agent("/api/admin/unit_info", agent unit_info, router.methods_get)
 			map_uri_template_agent ("/api/admin/lab_courses", agent lab_courses, router.methods_get)
 			map_uri_template_agent ("/api/admin/number_students", agent number_students, router.methods_get)
-			map_uri_template_agent ("/api/admin/number_collaborations", agent number_students, router.methods_get)
+			map_uri_template_agent ("/api/admin/number_collaborations", agent number_collaborations, router.methods_get)
+			map_uri_template_agent ("/api/admin/best_paper", agent best_paper, router.methods_get)
 			create fhdl.make_hidden("www")
 			fhdl.set_directory_index(<<"index.html">>)
 			router.handle("",fhdl,router.methods_GET)
 		end
 
 
-
-
-	number_collaborations(req:WSF_REQUEST; res:WSF_RESPONSE)
+	best_paper(req: WSF_REQUEST; res: WSF_RESPONSE)
 	local
 		db: SQLITE_DATABASE
 		db_query_statement: SQLITE_QUERY_STATEMENT
@@ -64,9 +63,41 @@ feature {NONE} --Initialization
 		mesg: WSF_HTML_PAGE_RESPONSE
         l_html: STRING
         do
+        name_of_unit := ""
+        	if attached {WSF_STRING} req.query_parameter ("NameOfUnit") as data_i then
+			name_of_unit := data_i.url_encoded_value
+			end
+        create db.make_open_read_write ("AnnualForm.db")
+
+        query :="[
+  			SELECT BestPaperAwards.ANSWER FROM BestPaperAwards
+   			JOIN NameOfUnit
+    		ON BestPaperAwards.G_ID = NameOfUnit.G_ID
+			WHERE (NameOfUnit.ANSWER =
+
+			]" + name_of_unit +");"
+
+		end
+
+	number_collaborations(req:WSF_REQUEST; res:WSF_RESPONSE)
+	local
+		db: SQLITE_DATABASE
+		db_query_statement: SQLITE_QUERY_STATEMENT
+		db_insert_statement: SQLITE_INSERT_STATEMENT
+		cursor: SQLITE_STATEMENT_ITERATION_CURSOR
+		query: READABLE_STRING_8
+		response_id :STRING
+		i : INTEGER
+		index: INTEGER
+		start_date:READABLE_STRING_8
+		end_date:READABLE_STRING_8
+		name_of_unit:READABLE_STRING_8
+		mesg: WSF_HTML_PAGE_RESPONSE
+        l_html: STRING
+        do
         create db.make_open_read_write ("AnnualForm.db")
         query := "[
-  			SELECT ANSWER FROM ResearchCollaborations;
+  			SELECT ANSWER FROM ResearchColaborations;
 		]"
 		i:=0
 		io.put_string(query)
@@ -80,12 +111,12 @@ feature {NONE} --Initialization
 			cursor.after
 		loop
 
-
+			cursor.item.string_value (1).replace_substring_all ("'%'2C", ",")
 			i := i + cursor.item.string_value (1).split (',').count
 
 			cursor.forth
 		end
-		if i=0 then l_html.append ("<p>There is no any students in laboratories</p>") else
+		if i=0 then l_html.append ("<p>There is no any collaborations in laboratories</p>") else
 			l_html.append ("<p> There are " + i.out + " collaborations in laboratories" )
 		end
 		mesg.set_body (l_html)
@@ -101,9 +132,9 @@ feature {NONE} --Initialization
 		query: READABLE_STRING_8
 		response_id :STRING
 		i : INTEGER
+		name_of_unit:READABLE_STRING_8
 		start_date:READABLE_STRING_8
 		end_date:READABLE_STRING_8
-		name_of_unit:READABLE_STRING_8
 		mesg: WSF_HTML_PAGE_RESPONSE
         l_html: STRING
         do
@@ -122,6 +153,7 @@ feature {NONE} --Initialization
 		until
 			cursor.after
 		loop
+
 
 
 			i := i + cursor.item.string_value (1).split (',').count
@@ -347,6 +379,14 @@ WHERE (NameOfUnit.ANSWER = '
 				io.put_new_line
 				create db_insert_statement.make (query, db)
 				db_insert_statement.execute
+				--TEST FEATURE
+				query := "UPDATE " + db_table_names.at(i) +" SET ANSWER = replace(ANSWER, '+', ' ');"
+				create db_insert_statement.make (query, db)
+				db_insert_statement.execute
+				query := "UPDATE " + db_table_names.at(i) +" SET ANSWER = replace(ANSWER, '%%2C', ',');"
+				create db_insert_statement.make (query, db)
+				db_insert_statement.execute
+
 			end
 			i := i+1
 		end
