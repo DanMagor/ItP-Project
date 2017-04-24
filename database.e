@@ -259,8 +259,10 @@ feature
 			db_insert_statement.execute
 
 			db.close
+
 		ensure
 			db_is_empty: db /= void
+			db_is_open: db.is_closed
 			end
 
 end

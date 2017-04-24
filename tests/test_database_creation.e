@@ -25,7 +25,7 @@ feature -- Test routines
 		do
 			create db.make
 		ensure
-			
+
 		end
 
 end

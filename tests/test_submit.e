@@ -20,9 +20,11 @@ feature -- Test routines
 		note
 			testing:  "covers/{APPLICATION_EXECUTION}.setup_router"
 		local
-			app: APPLICATION_EXECUTION
+			app: APPLICATION
+			req: WSF_REQUEST
+			res: WSF_RESPONSE
 		do
-			
+
 		end
 
 end
