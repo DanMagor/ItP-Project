@@ -54,14 +54,8 @@ feature {NONE} --Initialization
 		local
 			db: SQLITE_DATABASE
 			db_query_statement: SQLITE_QUERY_STATEMENT
-			db_insert_statement: SQLITE_INSERT_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			response_id: STRING
-			i: INTEGER
-			start_date: READABLE_STRING_8
-			end_date: READABLE_STRING_8
-			name_of_unit: READABLE_STRING_8
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
@@ -70,7 +64,7 @@ feature {NONE} --Initialization
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
 			create l_html.make_empty
-			l_html.append ("<h1>NAME OF UNITS:</h1>")
+			l_html.append ("<h1>Name of units</h1>")
 			from
 				cursor.start
 			until
@@ -91,13 +85,8 @@ feature {NONE} --Initialization
 		local
 			db: SQLITE_DATABASE
 			db_query_statement: SQLITE_QUERY_STATEMENT
-			db_insert_statement: SQLITE_INSERT_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			response_id: STRING
-			i: INTEGER
-			start_date: READABLE_STRING_8
-			end_date: READABLE_STRING_8
 			name_of_unit: READABLE_STRING_8
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
@@ -108,16 +97,17 @@ feature {NONE} --Initialization
 			end
 			create db.make_open_read_write ("AnnualForm.db")
 			query := "[
-				SELECT BestPaperAwards.ANSWER FROM BestPaperAwards
+				SELECT BestPaperAwards.ANSWER
+					FROM BestPaperAwards
 				JOIN NameOfUnit
-				ON BestPaperAwards.G_ID = NameOfUnit.G_ID
+					USING (G_ID)
 				WHERE (NameOfUnit.ANSWER = '
 			]" + name_of_unit + "');"
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
 			cursor.start
 			create l_html.make_empty
-			l_html.append ("<h1>Best papers:</h1>")
+			l_html.append ("<h1>Best papers</h1>")
 			if not cursor.after then
 				l_html.append ("<p>" + cursor.item.string_value (1) + "</p>")
 			else
@@ -132,42 +122,31 @@ feature {NONE} --Initialization
 		local
 			db: SQLITE_DATABASE
 			db_query_statement: SQLITE_QUERY_STATEMENT
-			db_insert_statement: SQLITE_INSERT_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			response_id: STRING
 			i: INTEGER
-			index: INTEGER
-			start_date: READABLE_STRING_8
-			end_date: READABLE_STRING_8
-			name_of_unit: READABLE_STRING_8
-			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
+			mesg: WSF_HTML_PAGE_RESPONSE
 		do
 			create db.make_open_read_write ("AnnualForm.db")
 			query := "[
 				SELECT ANSWER FROM ResearchColaborations;
 			]"
-			i := 0
-			io.put_string (query)
 			create db_query_statement.make (query, db)
+			i := 0
 			cursor := db_query_statement.execute_new
-			create l_html.make_empty
-			create mesg.make
-			from
-				cursor.start
-			until
-				cursor.after
+			cursor.start
+			across
+				cursor as it
 			loop
-				cursor.item.string_value (1).replace_substring_all ("''2C", ",")
-				i := i + cursor.item.string_value (1).split (',').count
-				cursor.forth
+				i := i + it.item.string_value (1).split (',').count
 			end
 			if i = 0 then
-				l_html.append ("<p>There is no any collaborations in laboratories</p>")
+				l_html := "<p>There is no any collaborations in laboratories</p>"
 			else
-				l_html.append ("<p> There are " + i.out + " collaborations in laboratories")
+				l_html := "<p> There are " + i.out + " collaborations in laboratories</p>"
 			end
+			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
 		end
@@ -176,14 +155,9 @@ feature {NONE} --Initialization
 		local
 			db: SQLITE_DATABASE
 			db_query_statement: SQLITE_QUERY_STATEMENT
-			db_insert_statement: SQLITE_INSERT_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			response_id: STRING
 			i: INTEGER
-			name_of_unit: READABLE_STRING_8
-			start_date: READABLE_STRING_8
-			end_date: READABLE_STRING_8
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
@@ -218,10 +192,8 @@ feature {NONE} --Initialization
 		local
 			db: SQLITE_DATABASE
 			db_query_statement: SQLITE_QUERY_STATEMENT
-			db_insert_statement: SQLITE_INSERT_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			response_id: STRING
 			i: INTEGER
 			start_date: READABLE_STRING_8
 			end_date: READABLE_STRING_8
@@ -249,13 +221,13 @@ feature {NONE} --Initialization
 			io.put_string (end_date)
 			io.put_new_line
 			query := "[
-								SELECT NameOfUnit.ANSWER, NameOfHeadOfUnit.ANSWER, StartOfReportingPeriod.ANSWER, 
-					EndOfReportingPeriod.ANSWER, CourseTaught.ANSWER, Examinations.ANSWER, StudentSupervised.ANSWER, 
+								SELECT NameOfUnit.ANSWER, NameOfHeadOfUnit.ANSWER, StartOfReportingPeriod.ANSWER,
+					EndOfReportingPeriod.ANSWER, CourseTaught.ANSWER, Examinations.ANSWER, StudentSupervised.ANSWER,
 					CompletedStudentReports.ANSWER, CompletedPhDTheses.ANSWER, Grants.ANSWER, CourseTaught.ANSWER,
 					ResearchProjects.ANSWER, ResearchColaborations.ANSWER,  ConferencePublications.ANSWER,
 					JournalPublications.ANSWER, Patents.ANSWER, IPLicensing.ANSWER, BestPaperAwards.ANSWER,
 					Membership.ANSWER, Prizes.ANSWER, IndustryColaborations.ANSWER, OtherInformation.ANSWER
-				FROM NameOfUnit 
+				FROM NameOfUnit
 					JOIN NameOfHeadOfUnit
 						ON NameOfHeadOfUnit.G_ID = NameOfUnit.G_ID
 					JOIN StartofReportingPeriod
@@ -303,7 +275,7 @@ feature {NONE} --Initialization
 			cursor := db_query_statement.execute_new
 			create l_html.make_empty
 			create mesg.make
-			l_html.append ("<h1>Info about unit:</h1>")
+			l_html.append ("<h1>Info about unit</h1>")
 			from
 				cursor.start
 			until
@@ -333,28 +305,21 @@ feature {NONE} --Initialization
 		local
 			db: SQLITE_DATABASE
 			db_query_statement: SQLITE_QUERY_STATEMENT
-			db_insert_statement: SQLITE_INSERT_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			i: INTEGER
-			response_id: STRING
-			db_table_names: ARRAY [STRING]
 			start_year: INTEGER
 			end_year: INTEGER
-			end_year_str: READABLE_STRING_8
-			column: NATURAL_32
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
 			create db.make_open_read_write ("AnnualForm.db")
-
 			if attached {WSF_STRING} req.query_parameter ("StartOfReportingPeriod") as data_i then
 				start_year := data_i.url_encoded_value.to_integer_32
 				end_year := start_year + 1
 				query := "[
-					SELECT ConferencePublications.ANSWER, JournalPublications.ANSWER 
+					SELECT ConferencePublications.ANSWER, JournalPublications.ANSWER
 					FROM StartOfReportingPeriod
-					JOIN ConferencePublications 
+					JOIN ConferencePublications
 					ON ConferencePublications.G_ID = StartOfReportingPeriod.G_ID
 					JOIN JournalPublications
 					ON JournalPublications.G_ID = StartOfReportingPeriod.G_ID
@@ -365,7 +330,7 @@ feature {NONE} --Initialization
 				cursor := db_query_statement.execute_new
 				create l_html.make_empty
 				create mesg.make
-				l_html.append ("<h1>Publications over year:</h1>")
+				l_html.append ("<h1>Publications over year</h1>")
 				from
 					cursor.start
 				until
@@ -392,42 +357,36 @@ feature {NONE} --Initialization
 			db_insert_statement: SQLITE_INSERT_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			i: INTEGER
 			response_id: INTEGER
 			db_table_names: ARRAY [STRING]
+			db_table_name: STRING
 		do
 			create db.make_open_read_write ("AnnualForm.db")
-			
 			query := "INSERT INTO General (NAME) VALUES('response');"
 			create db_insert_statement.make (query, db)
 			db_insert_statement.execute;
-
 			query := "SELECT MAX(ID) FROM General;"
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
 			response_id := cursor.item.integer_value (1)
-
-			from
-				i := 1
-				db_table_names := <<"NameOfUnit", "NameOfHeadOfUnit", "StartOfReportingPeriod", "EndOfReportingPeriod", "CourseTaught", "Examinations", "StudentSupervised", "CompletedStudentReports", "CompletedPhDTheses", "Grants", "ResearchProjects", "ResearchColaborations", "ConferencePublications", "JournalPublications", "Patents", "IPLicensing", "BestPaperAwards", "Membership", "Prizes", "IndustryColaborations", "OtherInformation">>
-			until
-				i > db_table_names.count
+			db_table_names := <<"NameOfUnit", "NameOfHeadOfUnit", "StartOfReportingPeriod", "EndOfReportingPeriod", "CourseTaught", "Examinations", "StudentSupervised", "CompletedStudentReports", "CompletedPhDTheses", "Grants", "ResearchProjects", "ResearchColaborations", "ConferencePublications", "JournalPublications", "Patents", "IPLicensing", "BestPaperAwards", "Membership", "Prizes", "IndustryColaborations", "OtherInformation">>
+			across
+				db_table_names as it
 			loop
-				if attached {WSF_STRING} req.query_parameter (db_table_names.at (i)) as data_i then
-					query := "INSERT INTO " + db_table_names.at (i) + "(ANSWER, G_ID) VALUES ('" + data_i.url_encoded_value + "','" + response_id.out + "');"
-					io.put_string (query)
-					io.put_new_line
+				db_table_name := it.item
+				if attached {WSF_STRING} req.query_parameter (db_table_name) as data_i then
+					query := "INSERT INTO " + db_table_name + "(ANSWER, G_ID) VALUES ('" + data_i.url_encoded_value + "','" + response_id.out + "');"
 					create db_insert_statement.make (query, db)
 					db_insert_statement.execute
+
 						--TEST FEATURE
-					query := "UPDATE " + db_table_names.at (i) + " SET ANSWER = replace(ANSWER, '+', ' ');"
+					query := "UPDATE " + db_table_name + " SET ANSWER = replace(ANSWER, '+', ' ');"
 					create db_insert_statement.make (query, db)
 					db_insert_statement.execute
-					query := "UPDATE " + db_table_names.at (i) + " SET ANSWER = replace(ANSWER, '%%2C', ',');"
+					query := "UPDATE " + db_table_name + " SET ANSWER = replace(ANSWER, '%%2C', ',');"
 					create db_insert_statement.make (query, db)
 					db_insert_statement.execute
 				end
-				i := i + 1
 			end
 			db.close
 			res.redirect_now ("/index.html")
@@ -442,11 +401,8 @@ feature {NONE} --Initialization
 		local
 			db: SQLITE_DATABASE
 			db_query_statement: SQLITE_QUERY_STATEMENT
-			db_insert_statement: SQLITE_INSERT_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			response_id: STRING
-			i: INTEGER
 			start_date: READABLE_STRING_8
 			end_date: READABLE_STRING_8
 			name_of_unit: READABLE_STRING_8
@@ -467,7 +423,7 @@ feature {NONE} --Initialization
 				end_date := data_i.url_encoded_value
 			end
 			query := "[
-				SELECT CourseTaught.ANSWER 
+				SELECT CourseTaught.ANSWER
 				FROM CourseTaught
 					JOIN NameOfUnit
 						ON CourseTaught.G_ID = NameOfUnit.G_ID
@@ -477,28 +433,23 @@ feature {NONE} --Initialization
 						ON CourseTaught.G_ID = EndOfReportingPeriod.G_ID
 				WHERE (NameOfUnit.ANSWER='
 			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER > '" + start_date + "') AND (EndOfReportingPeriod.ANSWER < '" + end_date + "');"
-			io.put_string (query)
 			create db_query_statement.make (query, db)
-			cursor := db_query_statement.execute_new
 			create l_html.make_empty
-			create mesg.make
-			l_html.append ("<h1>Info about courses of the laboratory:</h1>")
-			from
-				cursor.start
-			until
-				cursor.after
+			l_html.append ("<h1>Info about courses of the laboratory</h1>")
+			cursor := db_query_statement.execute_new
+			cursor.start
+			across
+				cursor as it
 			loop
-				l_html.append ("<p>")
-				l_html.append (cursor.item.string_value (1))
-				l_html.append ("%N")
-				l_html.append ("</p>")
-				cursor.forth
+				l_html.append ("<p>" + it.item.string_value (1) + "</p>")
 			end
 			if not l_html.has_substring ("<p>") then
 				l_html.append ("<p>There is no information during that period</p>")
 			end
+			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 end
