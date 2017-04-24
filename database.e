@@ -9,13 +9,19 @@ class
 create
 	make
 
+
+
 feature
+
+	db: SQLITE_DATABASE
 	make
 		local
-			db: SQLITE_DATABASE
+
 			db_insert_statement: SQLITE_INSERT_STATEMENT
 			query: READABLE_STRING_8
+
 		do
+
 			create db.make_create_read_write ("AnnualForm.db")
 			create db.make_open_read_write ("AnnualForm.db")
 
@@ -253,6 +259,8 @@ feature
 			db_insert_statement.execute
 
 			db.close
+		ensure
+			db_is_empty: db /= void
 			end
 
 end
