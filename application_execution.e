@@ -118,10 +118,10 @@ feature {NONE} --Initialization
 					FROM BestPaperAwards
 				JOIN NameOfUnit
 					USING (G_ID)
-				WHERE (NameOfUnit.ANSWER = '
-			]" + name_of_unit + "');"
+				WHERE (NameOfUnit.ANSWER = ?);
+			]"
 			create db_query_statement.make (query, db)
-			cursor := db_query_statement.execute_new
+			cursor := db_query_statement.execute_new_with_arguments (<<name_of_unit>>)
 			cursor.start
 			create l_html.make_empty
 			l_html.append ("<h1>Best papers</h1>")
@@ -294,14 +294,17 @@ feature {NONE} --Initialization
 						USING (G_ID)
 					JOIN OtherInformation
 						USING (G_ID)
-				WHERE (NameOfUnit.ANSWER = '
-			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER >= '" + start_date + "') AND (EndOfReportingPeriod.ANSWER <= '" + end_date + "');"
+				WHERE
+						(NameOfUnit.ANSWER = ?)
+					AND (StartOfReportingPeriod.ANSWER >= ?)
+					AND (EndOfReportingPeriod.ANSWER <= ?);
+			]"
 			io.put_string (query)
 				--
 			l_html := "<h1>Info about unit</h1>"
 				--
 			create db_query_statement.make (query, db)
-			cursor := db_query_statement.execute_new
+			cursor := db_query_statement.execute_new_with_arguments (<<name_of_unit, start_date, end_date>>)
 			cursor.start
 			across
 				cursor as it
@@ -313,7 +316,7 @@ feature {NONE} --Initialization
 					l_html.append (it.item.string_value (i.item.to_natural_32))
 					l_html.append ("</p>")
 				end
-				l_html.append ("<hr/>");
+				l_html.append ("<hr/>")
 			end
 				--
 			if not l_html.has_substring ("<p>") then
@@ -343,16 +346,16 @@ feature {NONE} --Initialization
 				end_year := start_year + 1
 				query := "[
 					SELECT ConferencePublications.ANSWER, JournalPublications.ANSWER
-					FROM StartOfReportingPeriod
+						FROM StartOfReportingPeriod
 					JOIN ConferencePublications
-					ON ConferencePublications.G_ID = StartOfReportingPeriod.G_ID
+						USING (G_ID)
 					JOIN JournalPublications
-					ON JournalPublications.G_ID = StartOfReportingPeriod.G_ID
-					WHERE StartOfReportingPeriod.ANSWER between'
+						USING (G_ID)
+					WHERE
+						StartOfReportingPeriod.ANSWER BETWEEN ? AND ?;
 				]"
-				query := query + data_i.url_encoded_value + "' AND '" + end_year.out + "';"
 				create db_query_statement.make (query, db)
-				cursor := db_query_statement.execute_new
+				cursor := db_query_statement.execute_new_with_arguments (<<start_year, end_year>>)
 				create l_html.make_empty
 				create mesg.make
 				l_html.append ("<h1>Publications over year</h1>")
@@ -363,7 +366,6 @@ feature {NONE} --Initialization
 				loop
 					l_html.append ("<p>")
 					l_html.append (cursor.item.string_value (1) + " " + cursor.item.string_value (2))
-					l_html.append ("%N")
 					l_html.append ("</p>")
 					cursor.forth
 				end
@@ -387,7 +389,7 @@ feature {NONE} --Initialization
 		do
 			db := db_open
 				--
-			query := "INSERT INTO General (NAME) VALUES('response');"
+			query := "INSERT INTO General(NAME) VALUES('response');"
 			create db_insert_statement.make (query, db)
 			db_insert_statement.execute;
 			row_id := db_insert_statement.last_row_id
@@ -398,17 +400,18 @@ feature {NONE} --Initialization
 			loop
 				db_table_name := it.item
 				if attached {WSF_STRING} req.query_parameter (db_table_name) as data_i then
-					query := "INSERT INTO " + db_table_name + "(ANSWER, G_ID) VALUES ('" + data_i.url_encoded_value + "','" + row_id.out + "');"
+					query := "INSERT INTO ? (ANSWER, G_ID) VALUES (?, ?);"
 					create db_insert_statement.make (query, db)
-					db_insert_statement.execute
+					db_insert_statement.execute_with_arguments (<<db_table_name, data_i.url_encoded_value, row_id>>)
 
 						-- TEST FEATURE
-					query := "UPDATE " + db_table_name + " SET ANSWER = replace(ANSWER, '+', ' ');"
+					query := "UPDATE ? SET ANSWER = replace(ANSWER, '+', ' ');"
 					create db_insert_statement.make (query, db)
-					db_insert_statement.execute
-					query := "UPDATE " + db_table_name + " SET ANSWER = replace(ANSWER, '%%2C', ',');"
+					db_insert_statement.execute_with_arguments (<<db_table_name>>)
+
+					query := "UPDATE ? SET ANSWER = replace(ANSWER, '%%2C', ',');"
 					create db_insert_statement.make (query, db)
-					db_insert_statement.execute
+					db_insert_statement.execute_with_arguments (<<db_table_name>>)
 				end
 			end
 			db.close
@@ -452,18 +455,21 @@ feature {NONE} --Initialization
 				SELECT CourseTaught.ANSWER
 				FROM CourseTaught
 					JOIN NameOfUnit
-						ON CourseTaught.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN StartOfReportingPeriod
-						ON CourseTaught.G_ID = StartOfReportingPeriod.G_ID
+						USING (G_ID)
 					JOIN EndOfReportingPeriod
-						ON CourseTaught.G_ID = EndOfReportingPeriod.G_ID
-				WHERE (NameOfUnit.ANSWER='
-			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER >= '" + start_date + "') AND (EndOfReportingPeriod.ANSWER <= '" + end_date + "');"
+						USING (G_ID)
+				WHERE
+						(NameOfUnit.ANSWER = ?)
+					AND (StartOfReportingPeriod.ANSWER >= ?)
+					AND (EndOfReportingPeriod.ANSWER <= ?);
+			]"
 				--
 			l_html := "<h1>Info about courses of the laboratory</h1>"
 				--
 			create db_query_statement.make (query, db)
-			cursor := db_query_statement.execute_new
+			cursor := db_query_statement.execute_new_with_arguments (<<name_of_unit, start_date, end_date>>)
 			cursor.start
 			across
 				cursor as it
