@@ -7,12 +7,11 @@ class
 	APPLICATION
 
 inherit
-	WSF_DEFAULT_SERVICE[APPLICATION_EXECUTION]
+
+	WSF_DEFAULT_SERVICE [APPLICATION_EXECUTION]
 		redefine
 			initialize
 		end
-
-
 
 create
 	make_and_launch
@@ -21,12 +20,10 @@ feature {NONE} -- Initialization
 
 	initialize
 		local
-		database:DATABASE
-
+			database: DATABASE
 		do
-			set_service_option("port", 9090)
+			set_service_option ("port", 9090)
 			create database.make
-
 		end
 
 end

@@ -24,6 +24,18 @@ inherit
 create
 	make
 
+feature {NONE} -- Constants
+
+	db_path: STRING
+		once
+			Result := "AnnualForm.db"
+		end
+
+	db_open: SQLITE_DATABASE
+		do
+			create Result.make_open_read_write (db_path)
+		end
+
 feature {NONE} --Initialization
 
 	initialize
@@ -59,12 +71,11 @@ feature {NONE} --Initialization
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
+			db := db_open
 			query := "SELECT ANSWER FROM NameOfUnit;"
-			create db.make_open_read_write ("AnnualForm.db")
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
-			create l_html.make_empty
-			l_html.append ("<h1>Name of units</h1>")
+			l_html := "<h1>Name of units</h1>"
 			from
 				cursor.start
 			until
@@ -74,11 +85,12 @@ feature {NONE} --Initialization
 				cursor.forth
 			end
 			if not l_html.has_substring ("<p>") then
-				l_html.append ("<p>There is no any unit</p>")
+				l_html.append ("<p>There are no units yet.</p>")
 			end
 			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	best_paper (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -95,8 +107,12 @@ feature {NONE} --Initialization
 			if attached {WSF_STRING} req.query_parameter ("NameOfUnit") as data_i then
 				name_of_unit := data_i.url_encoded_value
 			end
-			create db.make_open_read_write ("AnnualForm.db")
+
+			
 			name_of_unit.replace_substring_all ("+", " ")
+
+			db := db_open
+
 			query := "[
 				SELECT BestPaperAwards.ANSWER
 					FROM BestPaperAwards
@@ -112,11 +128,12 @@ feature {NONE} --Initialization
 			if not cursor.after then
 				l_html.append ("<p>" + cursor.item.string_value (1) + "</p>")
 			else
-				l_html.append ("<span class='empty'>No papers yet.</span>")
+				l_html.append ("<p>There are no papers yet.</p>")
 			end
 			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	number_collaborations (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -129,12 +146,12 @@ feature {NONE} --Initialization
 			l_html: STRING
 			mesg: WSF_HTML_PAGE_RESPONSE
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			query := "[
 				SELECT ANSWER FROM ResearchColaborations;
 			]"
-			create db_query_statement.make (query, db)
 			i := 0
+			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
 			cursor.start
 			across
@@ -145,11 +162,12 @@ feature {NONE} --Initialization
 			if i = 0 then
 				l_html := "<p>There is no any collaborations in laboratories</p>"
 			else
-				l_html := "<p> There are " + i.out + " collaborations in laboratories</p>"
+				l_html := "<p>There are " + i.out + " collaborations in laboratories.</p>"
 			end
 			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	number_students (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -162,31 +180,31 @@ feature {NONE} --Initialization
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			query := "[
 				SELECT ANSWER FROM StudentSupervised;
 			]"
-			i := 0
 			io.put_string (query)
+				--
+			i := 0
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
-			create l_html.make_empty
-			create mesg.make
-			from
-				cursor.start
-			until
-				cursor.after
+			cursor.start
+			across
+				cursor as it
 			loop
-				i := i + cursor.item.string_value (1).split (',').count
-				cursor.forth
+				i := i + it.item.string_value (1).split (',').count
 			end
+				--
 			if i = 0 then
-				l_html.append ("<p>There is no any students in laboratories</p>")
+				l_html := "<p>There are no students in laboratories yet.</p>"
 			else
-				l_html.append ("<p> There are " + i.out + " students in laboratories")
+				l_html := "<p>There are " + i.out + " students in laboratories.</p>"
 			end
+			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	unit_info (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -195,17 +213,18 @@ feature {NONE} --Initialization
 			db_query_statement: SQLITE_QUERY_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			i: INTEGER
 			start_date: READABLE_STRING_8
 			end_date: READABLE_STRING_8
 			name_of_unit: STRING
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
+				--
 			name_of_unit := ""
 			start_date := ""
 			end_date := ""
+				--
 			if attached {WSF_STRING} req.query_parameter ("NameOfUnit") as data_i then
 				name_of_unit := data_i.url_encoded_value
 			end
@@ -215,15 +234,20 @@ feature {NONE} --Initialization
 			if attached {WSF_STRING} req.query_parameter ("EndOfReportingPeriod") as data_i then
 				end_date := data_i.url_encoded_value
 			end
+
 			name_of_unit.replace_substring_all ("+", " ")
+
+				
+
 			io.put_string ("NEW LINES:")
 			io.put_new_line
 			io.put_string (name_of_unit)
 			io.put_string (start_date)
 			io.put_string (end_date)
 			io.put_new_line
+				--
 			query := "[
-								SELECT NameOfUnit.ANSWER, NameOfHeadOfUnit.ANSWER, StartOfReportingPeriod.ANSWER,
+				SELECT NameOfUnit.ANSWER, NameOfHeadOfUnit.ANSWER, StartOfReportingPeriod.ANSWER,
 					EndOfReportingPeriod.ANSWER, CourseTaught.ANSWER, Examinations.ANSWER, StudentSupervised.ANSWER,
 					CompletedStudentReports.ANSWER, CompletedPhDTheses.ANSWER, Grants.ANSWER, CourseTaught.ANSWER,
 					ResearchProjects.ANSWER, ResearchColaborations.ANSWER,  ConferencePublications.ANSWER,
@@ -231,76 +255,75 @@ feature {NONE} --Initialization
 					Membership.ANSWER, Prizes.ANSWER, IndustryColaborations.ANSWER, OtherInformation.ANSWER
 				FROM NameOfUnit
 					JOIN NameOfHeadOfUnit
-						ON NameOfHeadOfUnit.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN StartofReportingPeriod
-						ON StartofReportingPeriod.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN EndOfReportingPeriod
-						ON EndOfReportingPeriod.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN CourseTaught
-						ON CourseTaught.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Examinations
-						ON Examinations.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN StudentSupervised
-						ON StudentSupervised.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN CompletedStudentReports
-						ON CompletedStudentReports.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN CompletedPhDTheses
-						ON CompletedPhDTheses.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Grants
-						ON Grants.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN ResearchProjects
-						ON ResearchProjects.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN ResearchColaborations
-						ON ResearchColaborations.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN ConferencePublications
-						ON ConferencePublications.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN JournalPublications
-						ON JournalPublications.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Patents
-						ON Patents.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN IPLicensing
-						ON IPLicensing.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN BestPaperAwards
-						ON BestPaperAwards.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Membership
-						ON Membership.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Prizes
-						ON Prizes.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN IndustryColaborations
-						ON IndustryColaborations.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN OtherInformation
-						ON OtherInformation.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 				WHERE (NameOfUnit.ANSWER = '
 			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER > '" + start_date + "') AND (EndOfReportingPeriod.ANSWER < '" + end_date + "');"
 			io.put_string (query)
+				--
+			l_html := "<h1>Info about unit</h1>"
+				--
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
-			create l_html.make_empty
-			create mesg.make
-			l_html.append ("<h1>Info about unit</h1>")
-			from
-				cursor.start
-			until
-				cursor.after
+			cursor.start
+			across
+				cursor as it
 			loop
-				l_html.append ("<p>")
-				from
-					i := 1
-				until
-					i > 22
+				across
+					1 |..| 22 as i
 				loop
-					l_html.append (cursor.item.string_value (i.to_natural_32))
-					l_html.append ("%N")
+					l_html.append ("<p>")
+					l_html.append (it.item.string_value (i.item.to_natural_32))
 					l_html.append ("</p>")
-					i := i + 1
 				end
-				cursor.forth
+				l_html.append ("<hr/>");
 			end
+				--
 			if not l_html.has_substring ("<p>") then
 				l_html.append ("<p>There is no information during that period</p>")
 			end
+				--
+			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	publications_over_year (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -314,7 +337,7 @@ feature {NONE} --Initialization
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			if attached {WSF_STRING} req.query_parameter ("StartOfReportingPeriod") as data_i then
 				start_year := data_i.url_encoded_value.to_integer_32
 				end_year := start_year + 1
@@ -350,38 +373,36 @@ feature {NONE} --Initialization
 				mesg.set_body (l_html)
 				response.send (mesg)
 			end
+			db.close
 		end
 
 	submit (req: WSF_REQUEST; res: WSF_RESPONSE)
 		local
 			db: SQLITE_DATABASE
-			db_query_statement: SQLITE_QUERY_STATEMENT
 			db_insert_statement: SQLITE_INSERT_STATEMENT
-			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			response_id: INTEGER
+			row_id: INTEGER_64
 			db_table_names: ARRAY [STRING]
 			db_table_name: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
+				--
 			query := "INSERT INTO General (NAME) VALUES('response');"
 			create db_insert_statement.make (query, db)
 			db_insert_statement.execute;
-			query := "SELECT MAX(ID) FROM General;"
-			create db_query_statement.make (query, db)
-			cursor := db_query_statement.execute_new
-			response_id := cursor.item.integer_value (1)
+			row_id := db_insert_statement.last_row_id
+				--
 			db_table_names := <<"NameOfUnit", "NameOfHeadOfUnit", "StartOfReportingPeriod", "EndOfReportingPeriod", "CourseTaught", "Examinations", "StudentSupervised", "CompletedStudentReports", "CompletedPhDTheses", "Grants", "ResearchProjects", "ResearchColaborations", "ConferencePublications", "JournalPublications", "Patents", "IPLicensing", "BestPaperAwards", "Membership", "Prizes", "IndustryColaborations", "OtherInformation">>
 			across
 				db_table_names as it
 			loop
 				db_table_name := it.item
 				if attached {WSF_STRING} req.query_parameter (db_table_name) as data_i then
-					query := "INSERT INTO " + db_table_name + "(ANSWER, G_ID) VALUES ('" + data_i.url_encoded_value + "','" + response_id.out + "');"
+					query := "INSERT INTO " + db_table_name + "(ANSWER, G_ID) VALUES ('" + data_i.url_encoded_value + "','" + row_id.out + "');"
 					create db_insert_statement.make (query, db)
 					db_insert_statement.execute
 
-						--TEST FEATURE
+						-- TEST FEATURE
 					query := "UPDATE " + db_table_name + " SET ANSWER = replace(ANSWER, '+', ' ');"
 					create db_insert_statement.make (query, db)
 					db_insert_statement.execute
@@ -411,10 +432,12 @@ feature {NONE} --Initialization
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
+				--
 			name_of_unit := ""
 			start_date := ""
 			end_date := ""
+				--
 			if attached {WSF_STRING} req.query_parameter ("NameOfUnit") as data_i then
 				name_of_unit := data_i.url_encoded_value
 			end
@@ -436,9 +459,10 @@ feature {NONE} --Initialization
 						ON CourseTaught.G_ID = EndOfReportingPeriod.G_ID
 				WHERE (NameOfUnit.ANSWER='
 			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER > '" + start_date + "') AND (EndOfReportingPeriod.ANSWER < '" + end_date + "');"
+				--
+			l_html := "<h1>Info about courses of the laboratory</h1>"
+				--
 			create db_query_statement.make (query, db)
-			create l_html.make_empty
-			l_html.append ("<h1>Info about courses of the laboratory</h1>")
 			cursor := db_query_statement.execute_new
 			cursor.start
 			across
