@@ -145,8 +145,8 @@ feature {NONE} --Initialization
 			query := "[
 				SELECT ANSWER FROM ResearchColaborations;
 			]"
-			create db_query_statement.make (query, db)
 			i := 0
+			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
 			cursor.start
 			across
@@ -179,25 +179,24 @@ feature {NONE} --Initialization
 			query := "[
 				SELECT ANSWER FROM StudentSupervised;
 			]"
-			i := 0
 			io.put_string (query)
+				--
+			i := 0
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
-			create l_html.make_empty
-			create mesg.make
-			from
-				cursor.start
-			until
-				cursor.after
+			cursor.start
+			across
+				cursor as it
 			loop
-				i := i + cursor.item.string_value (1).split (',').count
-				cursor.forth
+				i := i + it.item.string_value (1).split (',').count
 			end
+				--
 			if i = 0 then
-				l_html.append ("<p>There are no students in laboratories yet.</p>")
+				l_html := "<p>There are no students in laboratories yet.</p>"
 			else
-				l_html.append ("<p>There are " + i.out + " students in laboratories.</p>")
+				l_html := "<p>There are " + i.out + " students in laboratories.</p>"
 			end
+			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
 			db.close
@@ -239,7 +238,7 @@ feature {NONE} --Initialization
 			io.put_new_line
 				--
 			query := "[
-								SELECT NameOfUnit.ANSWER, NameOfHeadOfUnit.ANSWER, StartOfReportingPeriod.ANSWER,
+				SELECT NameOfUnit.ANSWER, NameOfHeadOfUnit.ANSWER, StartOfReportingPeriod.ANSWER,
 					EndOfReportingPeriod.ANSWER, CourseTaught.ANSWER, Examinations.ANSWER, StudentSupervised.ANSWER,
 					CompletedStudentReports.ANSWER, CompletedPhDTheses.ANSWER, Grants.ANSWER, CourseTaught.ANSWER,
 					ResearchProjects.ANSWER, ResearchColaborations.ANSWER,  ConferencePublications.ANSWER,
