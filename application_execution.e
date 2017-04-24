@@ -42,11 +42,52 @@ feature {NONE} --Initialization
 			map_uri_template_agent ("/api/admin/number_students", agent number_students, router.methods_get)
 			map_uri_template_agent ("/api/admin/number_collaborations", agent number_collaborations, router.methods_get)
 			map_uri_template_agent ("/api/admin/best_paper", agent best_paper, router.methods_get)
+
+			map_uri_template_agent ("/api/admin/list_of_units", agent list_of_units, router.methods_get)
 			create fhdl.make_hidden("www")
 			fhdl.set_directory_index(<<"index.html">>)
 			router.handle("",fhdl,router.methods_GET)
 		end
 
+	list_of_units(req: WSF_REQUEST; res: WSF_RESPONSE)
+	local
+		db: SQLITE_DATABASE
+		db_query_statement: SQLITE_QUERY_STATEMENT
+		db_insert_statement: SQLITE_INSERT_STATEMENT
+		cursor: SQLITE_STATEMENT_ITERATION_CURSOR
+		query: READABLE_STRING_8
+		response_id :STRING
+		i : INTEGER
+		start_date:READABLE_STRING_8
+		end_date:READABLE_STRING_8
+		name_of_unit:READABLE_STRING_8
+		mesg: WSF_HTML_PAGE_RESPONSE
+        l_html: STRING
+        do
+        create db.make_open_read_write ("AnnualForm.db")
+        query := "SELECT ANSWER FROM NameOfUnit;"
+        create db_query_statement.make (query, db)
+        cursor := db_query_statement.execute_new
+        create l_html.make_empty
+        l_html.append ("<h1>NAME OF UNITS:</h1>")
+        from
+			cursor.start
+		until
+			cursor.after
+		loop
+
+
+			l_html.append ("<p>"+cursor.item.string_value(1)+"</p>")
+
+			cursor.forth
+		end
+		if not l_html.has_substring ("<p>") then l_html.append ("<p>There is no any unit</p>")
+		end
+		create mesg.make
+		mesg.set_body (l_html)
+		response.send (mesg)
+
+        end
 
 	best_paper(req: WSF_REQUEST; res: WSF_RESPONSE)
 	local
@@ -73,9 +114,19 @@ feature {NONE} --Initialization
   			SELECT BestPaperAwards.ANSWER FROM BestPaperAwards
    			JOIN NameOfUnit
     		ON BestPaperAwards.G_ID = NameOfUnit.G_ID
-			WHERE (NameOfUnit.ANSWER =
-
-			]" + name_of_unit +");"
+			WHERE (NameOfUnit.ANSWER ='
+			]" + name_of_unit +"');"
+		create db_query_statement.make (query, db)
+		cursor := db_query_statement.execute_new
+		create l_html.make_empty
+		create mesg.make
+		l_html.append ("<h1>Best papers:</h1>")
+		cursor.start
+		if(not cursor.after) then
+		l_html.append ("<p>" + cursor.item.string_value (1) + "</p>")
+		end
+		mesg.set_body (l_html)
+		response.send (mesg)
 
 		end
 
