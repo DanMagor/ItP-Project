@@ -90,6 +90,7 @@ feature {NONE} --Initialization
 			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	best_paper (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -127,6 +128,7 @@ feature {NONE} --Initialization
 			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	number_collaborations (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -160,6 +162,7 @@ feature {NONE} --Initialization
 			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	number_students (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -197,6 +200,7 @@ feature {NONE} --Initialization
 			end
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	unit_info (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -311,6 +315,7 @@ feature {NONE} --Initialization
 			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
+			db.close
 		end
 
 	publications_over_year (req: WSF_REQUEST; res: WSF_RESPONSE)
@@ -360,6 +365,7 @@ feature {NONE} --Initialization
 				mesg.set_body (l_html)
 				response.send (mesg)
 			end
+			db.close
 		end
 
 	submit (req: WSF_REQUEST; res: WSF_RESPONSE)
