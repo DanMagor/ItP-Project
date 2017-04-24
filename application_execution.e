@@ -87,7 +87,7 @@ feature {NONE} --Initialization
 			db_query_statement: SQLITE_QUERY_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			name_of_unit: READABLE_STRING_8
+			name_of_unit: STRING
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
@@ -96,6 +96,7 @@ feature {NONE} --Initialization
 				name_of_unit := data_i.url_encoded_value
 			end
 			create db.make_open_read_write ("AnnualForm.db")
+			name_of_unit.replace_substring_all ("+", " ")
 			query := "[
 				SELECT BestPaperAwards.ANSWER
 					FROM BestPaperAwards
@@ -197,7 +198,7 @@ feature {NONE} --Initialization
 			i: INTEGER
 			start_date: READABLE_STRING_8
 			end_date: READABLE_STRING_8
-			name_of_unit: READABLE_STRING_8
+			name_of_unit: STRING
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
@@ -214,6 +215,7 @@ feature {NONE} --Initialization
 			if attached {WSF_STRING} req.query_parameter ("EndOfReportingPeriod") as data_i then
 				end_date := data_i.url_encoded_value
 			end
+			name_of_unit.replace_substring_all ("+", " ")
 			io.put_string ("NEW LINES:")
 			io.put_new_line
 			io.put_string (name_of_unit)
@@ -405,7 +407,7 @@ feature {NONE} --Initialization
 			query: READABLE_STRING_8
 			start_date: READABLE_STRING_8
 			end_date: READABLE_STRING_8
-			name_of_unit: READABLE_STRING_8
+			name_of_unit: STRING
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
@@ -422,6 +424,7 @@ feature {NONE} --Initialization
 			if attached {WSF_STRING} req.query_parameter ("EndOfReporingPeriod") as data_i then
 				end_date := data_i.url_encoded_value
 			end
+			name_of_unit.replace_substring_all ("+", " ")
 			query := "[
 				SELECT CourseTaught.ANSWER
 				FROM CourseTaught
