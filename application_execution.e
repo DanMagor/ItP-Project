@@ -24,6 +24,18 @@ inherit
 create
 	make
 
+feature {NONE} -- Constants
+
+	db_path: STRING
+		once
+			Result := "AnnualForm.db"
+		end
+
+	db_open: SQLITE_DATABASE
+		do
+			create Result.make_open_read_write (db_path)
+		end
+
 feature {NONE} --Initialization
 
 	initialize
@@ -59,8 +71,8 @@ feature {NONE} --Initialization
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
+			db := db_open
 			query := "SELECT ANSWER FROM NameOfUnit;"
-			create db.make_open_read_write ("AnnualForm.db")
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
 			create l_html.make_empty
@@ -95,7 +107,7 @@ feature {NONE} --Initialization
 			if attached {WSF_STRING} req.query_parameter ("NameOfUnit") as data_i then
 				name_of_unit := data_i.url_encoded_value
 			end
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			query := "[
 				SELECT BestPaperAwards.ANSWER
 					FROM BestPaperAwards
@@ -128,7 +140,7 @@ feature {NONE} --Initialization
 			l_html: STRING
 			mesg: WSF_HTML_PAGE_RESPONSE
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			query := "[
 				SELECT ANSWER FROM ResearchColaborations;
 			]"
@@ -161,7 +173,7 @@ feature {NONE} --Initialization
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			query := "[
 				SELECT ANSWER FROM StudentSupervised;
 			]"
@@ -201,7 +213,7 @@ feature {NONE} --Initialization
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			name_of_unit := ""
 			start_date := ""
 			end_date := ""
@@ -312,7 +324,7 @@ feature {NONE} --Initialization
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			if attached {WSF_STRING} req.query_parameter ("StartOfReportingPeriod") as data_i then
 				start_year := data_i.url_encoded_value.to_integer_32
 				end_year := start_year + 1
@@ -361,7 +373,7 @@ feature {NONE} --Initialization
 			db_table_names: ARRAY [STRING]
 			db_table_name: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			query := "INSERT INTO General (NAME) VALUES('response');"
 			create db_insert_statement.make (query, db)
 			db_insert_statement.execute;
@@ -409,7 +421,7 @@ feature {NONE} --Initialization
 			mesg: WSF_HTML_PAGE_RESPONSE
 			l_html: STRING
 		do
-			create db.make_open_read_write ("AnnualForm.db")
+			db := db_open
 			name_of_unit := ""
 			start_date := ""
 			end_date := ""
