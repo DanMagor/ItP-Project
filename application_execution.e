@@ -307,7 +307,7 @@ feature {NONE} --Initialization
 					l_html.append (it.item.string_value (i.item.to_natural_32))
 					l_html.append ("</p>")
 				end
-				l_html.append ("<hr/>");
+				l_html.append ("<hr/>")
 			end
 				--
 			if not l_html.has_substring ("<p>") then
