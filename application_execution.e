@@ -241,45 +241,45 @@ feature {NONE} --Initialization
 					Membership.ANSWER, Prizes.ANSWER, IndustryColaborations.ANSWER, OtherInformation.ANSWER
 				FROM NameOfUnit
 					JOIN NameOfHeadOfUnit
-						ON NameOfHeadOfUnit.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN StartofReportingPeriod
-						ON StartofReportingPeriod.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN EndOfReportingPeriod
-						ON EndOfReportingPeriod.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN CourseTaught
-						ON CourseTaught.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Examinations
-						ON Examinations.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN StudentSupervised
-						ON StudentSupervised.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN CompletedStudentReports
-						ON CompletedStudentReports.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN CompletedPhDTheses
-						ON CompletedPhDTheses.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Grants
-						ON Grants.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN ResearchProjects
-						ON ResearchProjects.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN ResearchColaborations
-						ON ResearchColaborations.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN ConferencePublications
-						ON ConferencePublications.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN JournalPublications
-						ON JournalPublications.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Patents
-						ON Patents.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN IPLicensing
-						ON IPLicensing.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN BestPaperAwards
-						ON BestPaperAwards.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Membership
-						ON Membership.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN Prizes
-						ON Prizes.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN IndustryColaborations
-						ON IndustryColaborations.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 					JOIN OtherInformation
-						ON OtherInformation.G_ID = NameOfUnit.G_ID
+						USING (G_ID)
 				WHERE (NameOfUnit.ANSWER = '
 			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER > '" + start_date + "') AND (EndOfReportingPeriod.ANSWER < '" + end_date + "');"
 			io.put_string (query)
