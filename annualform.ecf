@@ -22,7 +22,10 @@
 		<library name="default_standalone" location="$ISE_LIBRARY\contrib\library\web\framework\ewf\wsf\default\standalone.ecf"/>
 		<library name="http" location="$ISE_LIBRARY\contrib\library\network\protocol\http\http.ecf"/>
 		<library name="sqlite" location="$ISE_LIBRARY\unstable\library\persistency\database\sqlite3\sqlite.ecf"/>
+		<library name="testing" location="$ISE_LIBRARY\library\testing\testing-safe.ecf"/>
 		<library name="wsf" location="$ISE_LIBRARY\contrib\library\web\framework\ewf\wsf\wsf.ecf"/>
-		<cluster name="annualform" location=".\" recursive="true"/>
+		<cluster name="annualform" location=".\" recursive="true">
+			<tests name="tests" location="\home\danmagor\ItP 3rd Delivery\tests\"/>
+		</cluster>
 	</target>
 </system>
