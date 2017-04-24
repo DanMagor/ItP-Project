@@ -75,8 +75,7 @@ feature {NONE} --Initialization
 			query := "SELECT ANSWER FROM NameOfUnit;"
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
-			create l_html.make_empty
-			l_html.append ("<h1>Name of units</h1>")
+			l_html := "<h1>Name of units</h1>"
 			from
 				cursor.start
 			until
@@ -86,7 +85,7 @@ feature {NONE} --Initialization
 				cursor.forth
 			end
 			if not l_html.has_substring ("<p>") then
-				l_html.append ("<p>There is no any unit</p>")
+				l_html.append ("<p>There are no units yet.</p>")
 			end
 			create mesg.make
 			mesg.set_body (l_html)
@@ -123,7 +122,7 @@ feature {NONE} --Initialization
 			if not cursor.after then
 				l_html.append ("<p>" + cursor.item.string_value (1) + "</p>")
 			else
-				l_html.append ("<span class='empty'>No papers yet.</span>")
+				l_html.append ("<p>There are no papers yet.</p>")
 			end
 			create mesg.make
 			mesg.set_body (l_html)
@@ -156,7 +155,7 @@ feature {NONE} --Initialization
 			if i = 0 then
 				l_html := "<p>There is no any collaborations in laboratories</p>"
 			else
-				l_html := "<p> There are " + i.out + " collaborations in laboratories</p>"
+				l_html := "<p>There are " + i.out + " collaborations in laboratories.</p>"
 			end
 			create mesg.make
 			mesg.set_body (l_html)
@@ -192,9 +191,9 @@ feature {NONE} --Initialization
 				cursor.forth
 			end
 			if i = 0 then
-				l_html.append ("<p>There is no any students in laboratories</p>")
+				l_html.append ("<p>There are no students in laboratories yet.</p>")
 			else
-				l_html.append ("<p> There are " + i.out + " students in laboratories")
+				l_html.append ("<p>There are " + i.out + " students in laboratories.</p>")
 			end
 			mesg.set_body (l_html)
 			response.send (mesg)
@@ -206,7 +205,6 @@ feature {NONE} --Initialization
 			db_query_statement: SQLITE_QUERY_STATEMENT
 			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			i: INTEGER
 			start_date: READABLE_STRING_8
 			end_date: READABLE_STRING_8
 			name_of_unit: READABLE_STRING_8
@@ -214,9 +212,11 @@ feature {NONE} --Initialization
 			l_html: STRING
 		do
 			db := db_open
+				--
 			name_of_unit := ""
 			start_date := ""
 			end_date := ""
+				--
 			if attached {WSF_STRING} req.query_parameter ("NameOfUnit") as data_i then
 				name_of_unit := data_i.url_encoded_value
 			end
@@ -226,12 +226,14 @@ feature {NONE} --Initialization
 			if attached {WSF_STRING} req.query_parameter ("EndOfReportingPeriod") as data_i then
 				end_date := data_i.url_encoded_value
 			end
+				--
 			io.put_string ("NEW LINES:")
 			io.put_new_line
 			io.put_string (name_of_unit)
 			io.put_string (start_date)
 			io.put_string (end_date)
 			io.put_new_line
+				--
 			query := "[
 								SELECT NameOfUnit.ANSWER, NameOfHeadOfUnit.ANSWER, StartOfReportingPeriod.ANSWER,
 					EndOfReportingPeriod.ANSWER, CourseTaught.ANSWER, Examinations.ANSWER, StudentSupervised.ANSWER,
@@ -283,32 +285,30 @@ feature {NONE} --Initialization
 				WHERE (NameOfUnit.ANSWER = '
 			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER > '" + start_date + "') AND (EndOfReportingPeriod.ANSWER < '" + end_date + "');"
 			io.put_string (query)
+				--
+			l_html := "<h1>Info about unit</h1>"
+				--
 			create db_query_statement.make (query, db)
 			cursor := db_query_statement.execute_new
-			create l_html.make_empty
-			create mesg.make
-			l_html.append ("<h1>Info about unit</h1>")
-			from
-				cursor.start
-			until
-				cursor.after
+			cursor.start
+			across
+				cursor as it
 			loop
-				l_html.append ("<p>")
-				from
-					i := 1
-				until
-					i > 22
+				across
+					1 |..| 22 as i
 				loop
-					l_html.append (cursor.item.string_value (i.to_natural_32))
-					l_html.append ("%N")
+					l_html.append ("<p>")
+					l_html.append (it.item.string_value (i.item.to_natural_32))
 					l_html.append ("</p>")
-					i := i + 1
 				end
-				cursor.forth
+				l_html.append ("<hr/>");
 			end
+				--
 			if not l_html.has_substring ("<p>") then
 				l_html.append ("<p>There is no information during that period</p>")
 			end
+				--
+			create mesg.make
 			mesg.set_body (l_html)
 			response.send (mesg)
 		end
@@ -365,33 +365,30 @@ feature {NONE} --Initialization
 	submit (req: WSF_REQUEST; res: WSF_RESPONSE)
 		local
 			db: SQLITE_DATABASE
-			db_query_statement: SQLITE_QUERY_STATEMENT
 			db_insert_statement: SQLITE_INSERT_STATEMENT
-			cursor: SQLITE_STATEMENT_ITERATION_CURSOR
 			query: READABLE_STRING_8
-			response_id: INTEGER
+			row_id: INTEGER_64
 			db_table_names: ARRAY [STRING]
 			db_table_name: STRING
 		do
 			db := db_open
+				--
 			query := "INSERT INTO General (NAME) VALUES('response');"
 			create db_insert_statement.make (query, db)
 			db_insert_statement.execute;
-			query := "SELECT MAX(ID) FROM General;"
-			create db_query_statement.make (query, db)
-			cursor := db_query_statement.execute_new
-			response_id := cursor.item.integer_value (1)
+			row_id := db_insert_statement.last_row_id
+				--
 			db_table_names := <<"NameOfUnit", "NameOfHeadOfUnit", "StartOfReportingPeriod", "EndOfReportingPeriod", "CourseTaught", "Examinations", "StudentSupervised", "CompletedStudentReports", "CompletedPhDTheses", "Grants", "ResearchProjects", "ResearchColaborations", "ConferencePublications", "JournalPublications", "Patents", "IPLicensing", "BestPaperAwards", "Membership", "Prizes", "IndustryColaborations", "OtherInformation">>
 			across
 				db_table_names as it
 			loop
 				db_table_name := it.item
 				if attached {WSF_STRING} req.query_parameter (db_table_name) as data_i then
-					query := "INSERT INTO " + db_table_name + "(ANSWER, G_ID) VALUES ('" + data_i.url_encoded_value + "','" + response_id.out + "');"
+					query := "INSERT INTO " + db_table_name + "(ANSWER, G_ID) VALUES ('" + data_i.url_encoded_value + "','" + row_id.out + "');"
 					create db_insert_statement.make (query, db)
 					db_insert_statement.execute
 
-						--TEST FEATURE
+						-- TEST FEATURE
 					query := "UPDATE " + db_table_name + " SET ANSWER = replace(ANSWER, '+', ' ');"
 					create db_insert_statement.make (query, db)
 					db_insert_statement.execute
@@ -422,9 +419,11 @@ feature {NONE} --Initialization
 			l_html: STRING
 		do
 			db := db_open
+				--
 			name_of_unit := ""
 			start_date := ""
 			end_date := ""
+				--
 			if attached {WSF_STRING} req.query_parameter ("NameOfUnit") as data_i then
 				name_of_unit := data_i.url_encoded_value
 			end
@@ -445,9 +444,10 @@ feature {NONE} --Initialization
 						ON CourseTaught.G_ID = EndOfReportingPeriod.G_ID
 				WHERE (NameOfUnit.ANSWER='
 			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER > '" + start_date + "') AND (EndOfReportingPeriod.ANSWER < '" + end_date + "');"
+				--
+			l_html := "<h1>Info about courses of the laboratory</h1>"
+				--
 			create db_query_statement.make (query, db)
-			create l_html.make_empty
-			l_html.append ("<h1>Info about courses of the laboratory</h1>")
 			cursor := db_query_statement.execute_new
 			cursor.start
 			across
