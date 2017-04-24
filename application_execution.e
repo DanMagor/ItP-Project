@@ -108,7 +108,7 @@ feature {NONE} --Initialization
 				name_of_unit := data_i.url_encoded_value
 			end
 
-			
+
 			name_of_unit.replace_substring_all ("+", " ")
 
 			db := db_open
@@ -237,7 +237,7 @@ feature {NONE} --Initialization
 
 			name_of_unit.replace_substring_all ("+", " ")
 
-				
+
 
 			io.put_string ("NEW LINES:")
 			io.put_new_line
@@ -295,7 +295,7 @@ feature {NONE} --Initialization
 					JOIN OtherInformation
 						USING (G_ID)
 				WHERE (NameOfUnit.ANSWER = '
-			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER > '" + start_date + "') AND (EndOfReportingPeriod.ANSWER < '" + end_date + "');"
+			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER >= '" + start_date + "') AND (EndOfReportingPeriod.ANSWER <= '" + end_date + "');"
 			io.put_string (query)
 				--
 			l_html := "<h1>Info about unit</h1>"
@@ -458,7 +458,7 @@ feature {NONE} --Initialization
 					JOIN EndOfReportingPeriod
 						ON CourseTaught.G_ID = EndOfReportingPeriod.G_ID
 				WHERE (NameOfUnit.ANSWER='
-			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER > '" + start_date + "') AND (EndOfReportingPeriod.ANSWER < '" + end_date + "');"
+			]" + name_of_unit + "') AND (StartOfReportingPeriod.ANSWER >= '" + start_date + "') AND (EndOfReportingPeriod.ANSWER <= '" + end_date + "');"
 				--
 			l_html := "<h1>Info about courses of the laboratory</h1>"
 				--
